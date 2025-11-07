@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InventoryPro - Enterprise Inventory Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Loading InventoryPro...</p>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="login-header">
+                <h2>Welcome to InventoryPro</h2>
+                <p>Sign in to your account</p>
+            </div>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+            <div class="login-footer">
+                <p>Demo Credentials: <strong>admin / admin</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="company-logo">
+                    <h1>InventoryPro</h1>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search products, customers, orders..." id="global-search">
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notification-count">3</span>
+                </div>
+                <div class="user-menu">
+                    <img src="https://via.placeholder.com/40x40/007BFF/ffffff?text=AD" alt="User Avatar" class="user-avatar">
+                    <span class="user-name" id="current-user">Admin User</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="app-container">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
+                        <i class="fas fa-boxes"></i>
+                        <span>InventoryPro</span>
+                    </div>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="menu-item" data-page="products">
+                        <i class="fas fa-box"></i>
+                        <span>Products</span>
+                    </li>
+                    <li class="menu-item" data-page="stock">
+                        <i class="fas fa-warehouse"></i>
+                        <span>Stock Management</span>
+                    </li>
+                    <li class="menu-item" data-page="customers">
+                        <i class="fas fa-users"></i>
+                        <span>Customers</span>
+                    </li>
+                    <li class="menu-item" data-page="sales">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Sales</span>
+                    </li>
+                    <li class="menu-item" data-page="reports">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </li>
+                    <li class="menu-item" data-page="barcode">
+                        <i class="fas fa-barcode"></i>
+                        <span>Barcode Scanner</span>
+                    </li>
+                    <li class="menu-item" data-page="users">
+                        <i class="fas fa-user-cog"></i>
+                        <span>User Management</span>
+                    </li>
+                    <li class="menu-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content" id="main-content">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page active">
+                    <div class="page-header">
+                        <h2>Dashboard</h2>
+                        <div class="page-actions">
+                            <button class="btn btn-outline" id="refresh-dashboard">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Widgets -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Total Products</h3>
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="kpi-value" id="total-products">1,247</div>
+                            <div class="kpi-change positive">+5.2% from last month</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Total Stock Value</h3>
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="kpi-value" id="total-stock-value">$245,890</div>
+                            <div class="kpi-change positive">+8.1% from last month</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Low Stock Alerts</h3>
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="kpi-value" id="low-stock-alerts">23</div>
+                            <div class="kpi-change negative">-2 from yesterday</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-header">
+                                <h3>Monthly Revenue</h3>
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="kpi-value" id="monthly-revenue">$89,450</div>
+                            <div class="kpi-change positive">+12.3% from last month</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts and Tables -->
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Sales Trend</h3>
+                                <select class="chart-period">
+                                    <option>Last 7 days</option>
+                                    <option>Last 30 days</option>
+                                    <option>Last 90 days</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="sales-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Top Products</h3>
+                                <a href="#" class="view-all">View All</a>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Stock</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="top-products">
+                                        <tr>
+                                            <td>Wireless Headphones</td>
+                                            <td>45</td>
+                                            <td>$4,500</td>
+                                        </tr>
+                                        <tr>
+                                            <td>USB-C Cable</td>
+                                            <td>230</td>
+                                            <td>$2,300</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Wireless Mouse</td>
+                                            <td>78</td>
+                                            <td>$3,900</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Recent Activities</h3>
+                            </div>
+                            <div class="activity-list" id="recent-activities">
+                                <div class="activity-item">
+                                    <i class="fas fa-plus-circle text-success"></i>
+                                    <div class="activity-content">
+                                        <p>New product added: Samsung Galaxy S24</p>
+                                        <span class="activity-time">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <i class="fas fa-shopping-cart text-primary"></i>
+                                    <div class="activity-content">
+                                        <p>Sale completed: Order #INV-2024-001</p>
+                                        <span class="activity-time">4 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                    <div class="activity-content">
+                                        <p>Low stock alert: iPhone 13 (3 units left)</p>
+                                        <span class="activity-time">6 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Page -->
+                <div id="products-page" class="page">
+                    <div class="page-header">
+                        <h2>Products</h2>
+                        <div class="page-actions">
+                            <button class="btn btn-outline" id="import-products">
+                                <i class="fas fa-upload"></i> Import
+                            </button>
+                            <button class="btn btn-outline" id="export-products">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-primary" id="add-product">
+                                <i class="fas fa-plus"></i> Add Product
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filters-section">
+                        <div class="filter-group">
+                            <input type="text" placeholder="Search products..." id="product-search" class="search-input">
+                            <select id="category-filter" class="filter-select">
+                                <option value="">All Categories</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="accessories">Accessories</option>
+                                <option value="components">Components</option>
+                            </select>
+                            <select id="supplier-filter" class="filter-select">
+                                <option value="">All Suppliers</option>
+                                <option value="supplier1">Tech Solutions Inc.</option>
+                                <option value="supplier2">Global Components Ltd.</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table" id="products-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="select-all"></th>
+                                    <th>SKU</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Supplier</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-tbody">
+                                <tr>
+                                    <td><input type="checkbox" class="product-checkbox" value="1"></td>
+                                    <td>SKU-001</td>
+                                    <td>Wireless Headphones Pro</td>
+                                    <td>Electronics</td>
+                                    <td>Tech Solutions Inc.</td>
+                                    <td>45</td>
+                                    <td>$99.99</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn-icon" onclick="editProduct(1)"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-icon" onclick="deleteProduct(1)"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="product-checkbox" value="2"></td>
+                                    <td>SKU-002</td>
+                                    <td>USB-C Cable 3m</td>
+                                    <td>Accessories</td>
+                                    <td>Global Components Ltd.</td>
+                                    <td>230</td>
+                                    <td>$12.99</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn-icon" onclick="editProduct(2)"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-icon" onclick="deleteProduct(2)"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="product-checkbox" value="3"></td>
+                                    <td>SKU-003</td>
+                                    <td>Wireless Gaming Mouse</td>
+                                    <td>Electronics</td>
+                                    <td>Tech Solutions Inc.</td>
+                                    <td>8</td>
+                                    <td>$79.99</td>
+                                    <td><span class="status-badge status-low">Low Stock</span></td>
+                                    <td>
+                                        <button class="btn-icon" onclick="editProduct(3)"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-icon" onclick="deleteProduct(3)"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Stock Management Page -->
+                <div id="stock-page" class="page">
+                    <div class="page-header">
+                        <h2>Stock Management</h2>
+                        <div class="page-actions">
+                            <button class="btn btn-outline" id="stock-adjustment">
+                                <i class="fas fa-edit"></i> Adjust Stock
+                            </button>
+                            <button class="btn btn-primary" id="stock-transfer">
+                                <i class="fas fa-exchange-alt"></i> Transfer Stock
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stock-tabs">
+                        <button class="tab-btn active" data-tab="movements">Stock Movements</button>
+                        <button class="tab-btn" data-tab="adjustments">Adjustments</button>
+                        <button class="tab-btn" data-tab="transfers">Transfers</button>
+                    </div>
+
+                    <div class="tab-content active" id="movements-tab">
+                        <div class="table-container">
+                            <table class="data-table" id="stock-movements-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Product</th>
+                                        <th>Type</th>
+                                        <th>Quantity</th>
+                                        <th>Reference</th>
+                                        <th>User</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stock-movements-tbody">
+                                    <tr>
+                                        <td>2024-11-07 14:30</td>
+                                        <td>Wireless Headphones Pro</td>
+                                        <td><span class="movement-badge movement-in">IN</span></td>
+                                        <td>+50</td>
+                                        <td>PO-2024-001</td>
+                                        <td>Admin User</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024-11-07 12:15</td>
+                                        <td>USB-C Cable 3m</td>
+                                        <td><span class="movement-badge movement-out">OUT</span></td>
+                                        <td>-5</td>
+                                        <td>SO-2024-003</td>
+                                        <td>Sales User</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024-11-07 10:45</td>
+                                        <td>Wireless Gaming Mouse</td>
+                                        <td><span class="movement-badge movement-adjustment">ADJ</span></td>
+                                        <td>-2</td>
+                                        <td>ADJ-2024-001</td>
+                                        <td>Manager</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="adjustments-tab">
+                        <div class="form-container">
+                            <h3>Stock Adjustment</h3>
+                            <form id="stock-adjustment-form" class="form-grid">
+                                <div class="form-group">
+                                    <label for="adj-product">Product</label>
+                                    <select id="adj-product" required>
+                                        <option value="">Select Product</option>
+                                        <option value="1">Wireless Headphones Pro</option>
+                                        <option value="2">USB-C Cable 3m</option>
+                                        <option value="3">Wireless Gaming Mouse</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="adj-type">Adjustment Type</label>
+                                    <select id="adj-type" required>
+                                        <option value="">Select Type</option>
+                                        <option value="increase">Increase</option>
+                                        <option value="decrease">Decrease</option>
+                                        <option value="correction">Correction</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="adj-quantity">Quantity</label>
+                                    <input type="number" id="adj-quantity" required min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="adj-reason">Reason</label>
+                                    <input type="text" id="adj-reason" required placeholder="Reason for adjustment">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="adj-notes">Notes</label>
+                                    <textarea id="adj-notes" rows="3" placeholder="Additional notes..."></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Apply Adjustment</button>
+                                    <button type="reset" class="btn btn-outline">Clear</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional pages structure for other features -->
+                <div id="customers-page" class="page">
+                    <div class="page-header">
+                        <h2>Customers</h2>
+                        <div class="page-actions">
+                            <button class="btn btn-primary" id="add-customer">
+                                <i class="fas fa-plus"></i> Add Customer
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="customers-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Total Orders</th>
+                                    <th>Total Spent</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-tbody">
+                                <tr>
+                                    <td>CUST-001</td>
+                                    <td>John Smith</td>
+                                    <td>john.smith@email.com</td>
+                                    <td>+1 (555) 123-4567</td>
+                                    <td>12</td>
+                                    <td>$2,340</td>
+                                    <td>
+                                        <button class="btn-icon" onclick="viewCustomer(1)"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-icon" onclick="editCustomer(1)"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="sales-page" class="page">
+                    <div class="page-header">
+                        <h2>Sales</h2>
+                        <div class="page-actions">
+                            <button class="btn btn-primary" id="new-sale">
+                                <i class="fas fa-plus"></i> New Sale
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-tbody">
+                                <tr>
+                                    <td>INV-2024-001</td>
+                                    <td>2024-11-07</td>
+                                    <td>John Smith</td>
+                                    <td>3</td>
+                                    <td>$299.97</td>
+                                    <td><span class="status-badge status-paid">Paid</span></td>
+                                    <td>
+                                        <button class="btn-icon" onclick="viewInvoice(1)"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-icon" onclick="printInvoice(1)"><i class="fas fa-print"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="reports-page" class="page">
+                    <div class="page-header">
+                        <h2>Reports</h2>
+                    </div>
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>Inventory Report</h3>
+                            <p>Complete inventory status and stock levels</p>
+                            <button class="btn btn-outline" onclick="generateReport('inventory')">Generate Report</button>
+                        </div>
+                        <div class="report-card">
+                            <h3>Sales Report</h3>
+                            <p>Sales performance and revenue analysis</p>
+                            <button class="btn btn-outline" onclick="generateReport('sales')">Generate Report</button>
+                        </div>
+                        <div class="report-card">
+                            <h3>Financial Report</h3>
+                            <p>Financial summary and profit analysis</p>
+                            <button class="btn btn-outline" onclick="generateReport('financial')">Generate Report</button>
+                        </div>
+                        <div class="report-card">
+                            <h3>Low Stock Report</h3>
+                            <p>Products with low stock levels</p>
+                            <button class="btn btn-outline" onclick="generateReport('low-stock')">Generate Report</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="barcode-page" class="page">
+                    <div class="page-header">
+                        <h2>Barcode Scanner</h2>
+                    </div>
+                    <div class="scanner-container">
+                        <div class="scanner-section">
+                            <h3>Camera Scanner</h3>
+                            <div class="camera-container" id="camera-container">
+                                <video id="video" autoplay></video>
+                                <canvas id="canvas" style="display: none;"></canvas>
+                                <div class="scanner-overlay">
+                                    <div class="scanner-line"></div>
+                                    <p>Position barcode within the frame</p>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="start-camera">
+                                <i class="fas fa-camera"></i> Start Camera
+                            </button>
+                            <button class="btn btn-outline" id="stop-camera" style="display: none;">
+                                <i class="fas fa-stop"></i> Stop Camera
+                            </button>
+                        </div>
+                        
+                        <div class="scanner-section">
+                            <h3>Manual Barcode Entry</h3>
+                            <form id="barcode-form" class="barcode-form">
+                                <div class="form-group">
+                                    <input type="text" id="barcode-input" placeholder="Enter barcode manually" maxlength="50">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Lookup Product</button>
+                            </form>
+                        </div>
+
+                        <div class="scanner-section">
+                            <h3>Recent Scans</h3>
+                            <div class="scans-list" id="recent-scans">
+                                <div class="scan-item">
+                                    <span class="barcode">1234567890123</span>
+                                    <span class="product">Wireless Headphones Pro</span>
+                                    <span class="timestamp">2 min ago</span>
+                                </div>
+                                <div class="scan-item">
+                                    <span class="barcode">9876543210987</span>
+                                    <span class="product">USB-C Cable 3m</span>
+                                    <span class="timestamp">5 min ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="users-page" class="page">
+                    <div class="page-header">
+                        <h2>User Management</h2>
+                        <div class="page-actions">
+                            <button class="btn btn-primary" id="add-user">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody">
+                                <tr>
+                                    <td>admin</td>
+                                    <td>Admin User</td>
+                                    <td>admin@company.com</td>
+                                    <td><span class="role-badge role-admin">Admin</span></td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn-icon" onclick="editUser('admin')"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>manager</td>
+                                    <td>Manager User</td>
+                                    <td>manager@company.com</td>
+                                    <td><span class="role-badge role-manager">Manager</span></td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn-icon" onclick="editUser('manager')"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="settings-page" class="page">
+                    <div class="page-header">
+                        <h2>Settings</h2>
+                    </div>
+                    <div class="settings-container">
+                        <div class="settings-section">
+                            <h3>Company Information</h3>
+                            <form id="company-form" class="form-grid">
+                                <div class="form-group">
+                                    <label for="company-name">Company Name</label>
+                                    <input type="text" id="company-name" value="Your Company Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="company-address">Address</label>
+                                    <input type="text" id="company-address" value="123 Business St, City, State 12345">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company-phone">Phone</label>
+                                    <input type="tel" id="company-phone" value="+1 (555) 123-4567">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company-email">Email</label>
+                                    <input type="email" id="company-email" value="info@yourcompany.com">
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Inventory Settings</h3>
+                            <form id="inventory-settings-form" class="form-grid">
+                                <div class="form-group">
+                                    <label for="low-stock-threshold">Low Stock Threshold</label>
+                                    <input type="number" id="low-stock-threshold" value="10" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="auto-reorder">Auto Reorder</label>
+                                    <select id="auto-reorder">
+                                        <option value="true">Enabled</option>
+                                        <option value="false">Disabled</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency">Currency</label>
+                                    <select id="currency">
+                                        <option value="USD">USD ($)</option>
+                                        <option value="EUR">EUR (€)</option>
+                                        <option value="GBP">GBP (£)</option>
+                                    </select>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Data Management</h3>
+                            <div class="data-management">
+                                <button class="btn btn-outline" id="backup-data">
+                                    <i class="fas fa-download"></i> Backup Data
+                                </button>
+                                <button class="btn btn-outline" id="restore-data">
+                                    <i class="fas fa-upload"></i> Restore Data
+                                </button>
+                                <button class="btn btn-outline" id="export-data">
+                                    <i class="fas fa-file-export"></i> Export All Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="product-modal-title">Add Product</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="product-form" class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="product-sku">SKU</label>
+                        <input type="text" id="product-sku" required placeholder="e.g., SKU-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-name">Product Name</label>
+                        <input type="text" id="product-name" required placeholder="Enter product name">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Category</label>
+                        <select id="product-category" required>
+                            <option value="">Select Category</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="components">Components</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-supplier">Supplier</label>
+                        <select id="product-supplier" required>
+                            <option value="">Select Supplier</option>
+                            <option value="supplier1">Tech Solutions Inc.</option>
+                            <option value="supplier2">Global Components Ltd.</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-cost">Cost Price</label>
+                        <input type="number" id="product-cost" step="0.01" min="0" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Selling Price</label>
+                        <input type="number" id="product-price" step="0.01" min="0" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-stock">Initial Stock</label>
+                        <input type="number" id="product-stock" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-min-stock">Min Stock Level</label>
+                        <input type="number" id="product-min-stock" min="0" value="5">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="product-description">Description</label>
+                        <textarea id="product-description" rows="3" placeholder="Product description..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="product-barcode">Barcode</label>
+                        <input type="text" id="product-barcode" placeholder="Enter or scan barcode">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                    <button type="button" class="btn btn-outline modal-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>
